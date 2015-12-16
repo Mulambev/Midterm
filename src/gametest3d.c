@@ -383,7 +383,7 @@ int main(int argc, char *argv[])
 		//entity_draw(player);
 
 
-		/*
+		
 		obj_draw(
             mapp,
             vec3d(-15,0,2),
@@ -401,11 +401,11 @@ int main(int argc, char *argv[])
             vec4d(1,1,1,1),
 		    maptexture2
 		);
-			*/
+			
 
        	    
 		
-		/*//Fire man
+		//Fire man
         obj_draw(
             boss,
             vec3d(u,y,2),
@@ -413,7 +413,7 @@ int main(int argc, char *argv[])
             vec3d(0.5,0.5,0.5),
             vec4d(1,1,1,1),
             bosstexture
-        );*/
+        );
         
         if (r > 360)r -= 360;
         glPopMatrix();
