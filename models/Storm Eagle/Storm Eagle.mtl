@@ -1,0 +1,167 @@
+# Blender3D MTL File: Storm Eagle.blend
+# Material Count: 15
+newmtl material277_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material283_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material330_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material300_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material48_Image0_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material213_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material118_Image.001_Wings.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Wings.png
+
+
+newmtl material118_Image_Bod_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material82_Image0_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material323_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material124_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material102_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material161_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material281_Image_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+
+newmtl material60_Image0_Body.png
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.257004 0.257004 0.257004
+Ks 0.007843 0.007843 0.007843
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Textures/Body.png
+
+

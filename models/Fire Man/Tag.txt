@@ -1,0 +1,7 @@
+Game: Mega Man: Powered Up
+Subject: Fire Man
+Copyright: Capcom
+Model Ripper: Random Talking Bush
+Hosting Permissions: The Models Resource
+Notes: Fire Man's head flame position may not completely accurate,
+       as I couldn't find the proper attachment point.

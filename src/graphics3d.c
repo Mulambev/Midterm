@@ -3,6 +3,7 @@
 #include "shader.h"
 #include <GL/glu.h>
 
+Uint32 TIME;
 
 static SDL_GLContext __graphics3d_gl_context;
 static SDL_Window  * __graphics3d_window = NULL;
@@ -60,6 +61,7 @@ int graphics3d_init(int sw,int sh,int fullscreen,const char *project,Uint32 fram
     //MUST make a context AND make it current BEFORE glewInit()!
     glewExperimental = GL_TRUE;
     glew_status = glewInit();
+
     if (glew_status != 0) 
     {
         slog("Error: %s", glewGetErrorString(glew_status));
@@ -116,15 +118,15 @@ void graphics3d_frame_begin()
 void graphics3d_next_frame()
 {
     static Uint32 then = 0;
-    Uint32 now;
     glPopMatrix();
     SDL_GL_SwapWindow(__graphics3d_window);
-    now = SDL_GetTicks();
-    if ((now - then) < __graphics3d_frame_delay)
+    TIME = SDL_GetTicks();
+    if ((TIME - then) < __graphics3d_frame_delay)
     {
-        SDL_Delay(__graphics3d_frame_delay - (now - then));        
+        SDL_Delay(__graphics3d_frame_delay - (TIME - then));        
     }
-    then = now;
+    //slog("ticks passed this frame: %i",(TIME - then));
+    then = TIME;
 }
 
 void graphics3d_setup_default_light()

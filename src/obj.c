@@ -386,12 +386,12 @@ Obj *obj_load(char *filename)
     
     
     obj_file_get_counts(objFile,file);
-    
+    /*
     slog("vertices: %i",objFile->num_vertices);
     slog("normals: %i",objFile->num_normals);
     slog("texels: %i",objFile->num_texels);
     slog("faces: %i",objFile->num_tris);
-    
+    */
     obj_allocate(objFile);
     obj_file_parse(objFile, file);
     
@@ -415,7 +415,7 @@ void obj_draw(
     
     if (obj == NULL)
     {
-        slog("cannot draw obj, none specified!");
+        //slog("cannot draw obj, none specified!");
         return;
     }
     glPushMatrix();

@@ -1,0 +1,22 @@
+# Blender MTL File: 'MPU.blend'
+# Material Count: 2
+
+newmtl Body
+Ns 19.607843
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd Mega Man\\images\\MegaManBody1.png
+
+newmtl Face
+Ns 19.607843
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd Mega Man\\images\\MegaManFace1.png

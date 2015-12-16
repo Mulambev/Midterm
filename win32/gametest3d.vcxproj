@@ -11,21 +11,38 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\body.c" />
+    <ClCompile Include="..\src\Boss.c" />
+    <ClCompile Include="..\src\collisions.c" />
+    <ClCompile Include="..\src\Entity.c" />
     <ClCompile Include="..\src\gametest3d.c" />
     <ClCompile Include="..\src\graphics3d.c" />
+    <ClCompile Include="..\src\mgl_callback.c" />
     <ClCompile Include="..\src\model.c" />
     <ClCompile Include="..\src\obj.c" />
+    <ClCompile Include="..\src\Projectile.c" />
     <ClCompile Include="..\src\shader.c" />
     <ClCompile Include="..\src\simple_logger.c" />
+    <ClCompile Include="..\src\space.c" />
     <ClCompile Include="..\src\sprite.c" />
     <ClCompile Include="..\src\vector.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\Body.h" />
+    <ClInclude Include="..\include\Boss.h" />
+    <ClInclude Include="..\include\BSP.h" />
+    <ClInclude Include="..\include\collisions.h" />
+    <ClInclude Include="..\include\Entity.h" />
     <ClInclude Include="..\include\graphics3d.h" />
+    <ClInclude Include="..\include\Map.h" />
+    <ClInclude Include="..\include\mgl_callback.h" />
     <ClInclude Include="..\include\model.h" />
     <ClInclude Include="..\include\obj.h" />
+    <ClInclude Include="..\include\Projectile.h" />
     <ClInclude Include="..\include\shader.h" />
     <ClInclude Include="..\include\simple_logger.h" />
+    <ClInclude Include="..\include\space.h" />
+    <ClInclude Include="..\include\Spawn.h" />
     <ClInclude Include="..\include\sprite.h" />
     <ClInclude Include="..\include\vector.h" />
   </ItemGroup>
@@ -56,10 +73,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Libraries\glew-1.12.0\include;C:\Libraries\SDL2-2.0.3\include;C:\Users\Bo\Desktop\gametest3d\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\glew-1.12.0\lib\Release\Win32;C:\Libraries\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\..</OutDir>
+    <IncludePath>C:\Users\The_Beach\Desktop\3d game dev\Libs\glib-2.28\include\glib-2.0;C:\Libraries\glew-1.12.0\include;C:\Users\The_Beach\Desktop\3d game dev\Midterm\include\glib-2.0;C:\Libraries\SDL2-2.0.3\include;C:\Users\The_Beach\Desktop\3d game dev\Libs\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\The_Beach\Desktop\3d game dev\Libs\glib-2.28\lib;C:\Users\The_Beach\Desktop\3d game dev\Libs\lib\x86;C:\Libraries\glew-1.12.0\lib\Release\Win32;C:\Libraries\SDL2-2.0.3\lib\x86;$(LibraryPath)</LibraryPath>
+    <OutDir>../</OutDir>
     <IntDir>$(ProjectDir)\..</IntDir>
+    <ReferencePath>C:\Users\The_Beach\Desktop\3d game dev\Libs\lib\x86;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\Users\The_Beach\Desktop\3d game dev\Libs\include;$(IncludePath)</IncludePath>
@@ -71,11 +89,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\Users\The_Beach\Desktop\3d game dev\Midterm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glib-2.0.lib;SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;SDL2_image.lib;glew32s.lib;glu32.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

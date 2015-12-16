@@ -18,35 +18,150 @@
  *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *    SOFTWARE.
  */
+#include "mgl_callback.h"
 #include "simple_logger.h"
 #include "graphics3d.h"
 #include "shader.h"
 #include "obj.h"
 #include "vector.h"
 #include "sprite.h"
+#include "entity.h"
+#include "space.h"
+#include "Boss.h"
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 void set_camera(Vec3D position, Vec3D rotation);
 
+void touch_callback(void *data, void *context)
+{
+    Entity *me,*other;
+    Body *obody;
+    if ((!data)||(!context))return;
+    me = (Entity *)data;
+    obody = (Body *)context;
+    if (entity_is_entity(obody->touch.data))
+    {
+        other = (Entity *)obody->touch.data;
+        //slog("%s is ",other->name);
+    }
+    //slog("touching me.... touching youuuuuuuu");
+}
+
+void think(Entity *self)
+{
+    if (!self)return;
+    switch(self->state)
+    {
+        case 0:
+            self->frame = 0;
+            break;
+        case 1:
+            self->frame += 0.3;
+            if (self->frame >= 24)self->frame = 0;
+            break;
+        case 2:
+            self->frame -= 0.3;
+            if (self->frame < 0)self->frame = 23;
+            break;
+    }
+    self->objModel = self->objAnimation[(int)self->frame];
+}
+
+
+Entity *newCube(Vec3D position,const char *name)
+{
+    Entity * ent;
+    char buffer[255];
+    int i;
+    ent = entity_new();
+    if (!ent)
+    {
+        return NULL;
+    }
+    /*for (i = 0; i < 24;i++)
+    {
+        //sprintf(buffer,"models/robot/walk_bot_%06i.obj",i + 1);
+        ent->objAnimation[i] = obj_load(buffer);
+    }*/
+    ent->objModel = obj_load("models/cube.obj");//ent->objAnimation[0];
+	if( !ent->objModel )
+		slog( "fuck" );
+    ent->texture = LoadSprite("models/cube_text.png",1024,1024); //LoadSprite("models/robot/robot.png",1024,1024);
+    vec3d_cpy(ent->body.position,position);
+	vec3d_set(ent->scale,1,1,1);
+	vec3d_set(ent->rotation,0,0,0);
+	vec4d_set(ent->color,1,1,1,1);
+    cube_set(ent->body.bounds,-1,-1,-1,2,2,2);
+    ent->rotation.x = 90;
+    sprintf(ent->name,"%s",name);
+    ent->think = think;
+    ent->state = 0;
+    mgl_callback_set(&ent->body.touch,touch_callback,ent);
+    return ent;
+}
+
+/*Entity *Player(Vec3D position, const char *name)
+	{
+		Entity * ent;
+		char buffer[255];
+		int i;
+		ent = entity_new();
+		if (!ent)
+		{
+			return NULL;
+		}
+
+		ent->objModel = obj_load("models/MPU.obj");
+		ent->texture = LoadSprite("models/MegaManBody1.png",1024,1024);
+		vec3d_cpy(ent->body.position,position);
+		cube_set(ent->body.bounds,-2.5,-2.5,0,2.5,2.5,2);
+		ent->think = think;
+		ent->state = 0;
+		mgl_callback_set(&ent->body.touch,touch_callback,ent);
+		return ent;
+
+		
+		
+		
+		/*1,					//inuse
+		1,					// uid
+		megaman,			//name[128]
+		vec3d(f, g, 2),		//position
+		vec3d(90,90,0),		//rotation
+		vec3d(0.5,0.5,0.5),	//scale
+		vec4d(1,1,1,1),		//color
+		megaman,			//model
+		megaman[0],			//animation
+		100,				//health
+		1,					//state
+		0,					//frame
+		megamantexture,		//texture
+		//Body body			//body
+		1;					//group
+		//void (*think)(struct Entity_S *self); //beh? think function maybe
+	}*/
+
+
 int main(int argc, char *argv[])
 {
-    GLuint vao;
+    int i;
     float r = 0;
-    GLuint triangleBufferObject;
+	int f = -15;
+	int g = 0;
+	int l = 0;
+	int y = 0;
+	int u = 15;
+	int q = 0;
+    Space *space;
+    Entity *cube1,*cube2, *Actor;
     char bGameLoopRunning = 1;
-    Vec3D cameraPosition = {0,-10,0.3};
-    Vec3D cameraRotation = {90,0,0};
+    Vec3D cameraPosition = {0,0,70.3};
+    Vec3D cameraRotation = {0,0,360};
     SDL_Event e;
-    Obj *obj,*bgobj;
-    Sprite *texture,*bgtext;
-    const float triangleVertices[] = {
-        0.0f, 0.5f, 0.0f, 1.0f,
-        0.5f, -0.366f, 0.0f, 1.0f,
-        -0.5f, -0.366f, 0.0f, 1.0f,
-        //next part contains vertex colors
-        1.0f, 0.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 1.0f  
-    }; //we love you vertices!
+    Obj *megaman,*boss, *mapp, *mape, *lemon;
+    Sprite *megamantexture, *bosstexture, *maptexture1, *maptexture2, *lemontexture;
     
     init_logger("gametest3d.log");
     if (graphics3d_init(1024,768,1,"gametest3d",33) != 0)
@@ -55,26 +170,46 @@ int main(int argc, char *argv[])
     }
     model_init();
     obj_init();
+    entity_init(255);
     
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao); //make our vertex array object, we need it to restore state we set after binding it. Re-binding reloads the state associated with it.
-    
-    glGenBuffers(1, &triangleBufferObject); //create the buffer
-    glBindBuffer(GL_ARRAY_BUFFER, triangleBufferObject); //we're "using" this one now
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW); //formatting the data for the buffer
-    glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind any buffers
-    
-    obj = obj_load("models/cube.obj");
-    texture = LoadSprite("models/cube_text.png",1024,1024);
+   //load objects, models here, replace cube with megaman
+   // megaman = obj_load("models/MPU.obj");
+	//load his uv map "texture file"
+    //megamantexture = LoadSprite("models/MegaManBody1.png",1024,1024);
 
-    bgobj = obj_load("models/mountainvillage.obj");
-    bgtext = LoadSprite("models/mountain_text.png",1024,1024);
+	boss = obj_load("models/Fireman.obj");
+	bosstexture = LoadSprite("models/FireManBody1.png",1024,1024);
+
+    mapp = obj_load("models/MidtermMapSingle.obj");
+	maptexture1 = LoadSprite("models/PlayerTile(Red).png",1024,1024);
+
+	mape = obj_load("models/MidtermMapSingle.obj");
+	maptexture2 = LoadSprite("models/BossTile(Blue).png",1024,1024);
     
-//    obj = obj_load("models/mountainvillage.obj");
+    lemon = obj_load("models/cube.obj");
+	lemontexture = LoadSprite("models/cube_text.png",1024,1024);
     
+	//Actor = Player(vec3d(f,g,2), "Megaman");
+	
+    cube1 = newCube(vec3d(u,y,2),"Cubert");
+    //cube2 = newCube(vec3d(10,0,5),"Hobbes");
     
+    //cube2->body.velocity.x = -0.1;
+    
+    space = space_new();
+    space_set_steps(space,100);
+    
+    //space_add_body(space,&cube1->body);
+    //space_add_body(space,&cube2->body);
+
     while (bGameLoopRunning)
     {
+        entity_think_all();
+
+        for (i = 0; i < 100;i++)
+        {
+            space_do_step(space);
+        }
         while ( SDL_PollEvent(&e) ) 
         {
             if (e.type == SDL_QUIT)
@@ -139,6 +274,52 @@ int main(int argc, char *argv[])
                             0
                         ));
                 }
+				else if (e.key.keysym.sym == SDLK_j)
+                {
+                   
+				   
+				   if(f >= -5)
+				   {
+					   f = -5;
+				   }
+				   else
+				   {
+					   f += 10;
+				   }
+                }
+				else if (e.key.keysym.sym == SDLK_g)
+                {
+                   
+				   f -= 10;
+				   if(f <= -20)
+				   {
+					   f = -25;
+				   }
+				  			
+                }
+				else if (e.key.keysym.sym == SDLK_y)
+                {
+                   
+				   if(g >= 5)
+				   {
+					   g = 10;
+				   }
+				   else
+				   {
+					   g += 10;
+				   }
+			
+                }
+				else if (e.key.keysym.sym == SDLK_h)
+                {
+                   
+				   g -= 10;
+				    if(g <= -5)
+				   {
+					   g = -10;
+				   }
+			
+                }
                 else if (e.key.keysym.sym == SDLK_LEFT)
                 {
                     cameraRotation.z += 1;
@@ -155,9 +336,30 @@ int main(int argc, char *argv[])
                 {
                     cameraRotation.x -= 1;
                 }
+                else if (e.key.keysym.sym == SDLK_n)
+                {
+                    cube1->state ++;
+                    if (cube1->state >= 3)cube1->state = 0;
+
+					/*//Boss_move(u,y);
+					q = q % 2;
+					switch(q)
+					{
+					case 0:
+							maptexture = LoadSprite("models/PlayerTile(Red).png",1024,1024);
+							break;
+					case 1:
+							maptexture = LoadSprite("models/BossTile(Blue).png",1024,1024);
+							break;
+					};
+
+					q+=1;*/
+
+                }
             }
         }
 
+                
         graphics3d_frame_begin();
         
         glPushMatrix();
@@ -165,24 +367,54 @@ int main(int argc, char *argv[])
             cameraPosition,
             cameraRotation);
         
-  
+        entity_draw_all();
+      
+   
+		//Megaman
         obj_draw(
-            bgobj,
-            vec3d(0,0,2),
+            megaman,
+            vec3d(f, g, 2),
+            vec3d(90,90,0),
+            vec3d(0.5,0.5,0.5),
+            vec4d(1,1,1,1),
+            megamantexture
+        );
+
+		//entity_draw(player);
+
+
+		/*
+		obj_draw(
+            mapp,
+            vec3d(-15,0,2),
             vec3d(90,90,0),
             vec3d(5,5,5),
             vec4d(1,1,1,1),
-            bgtext
-        );
-        
+		    maptexture1
+		);
+
+		obj_draw(
+            mape,
+            vec3d(15,0,2),
+            vec3d(90,90,0),
+            vec3d(5,5,5),
+            vec4d(1,1,1,1),
+		    maptexture2
+		);
+			*/
+
+       	    
+		
+		/*//Fire man
         obj_draw(
-            obj,
-            vec3d(0,0,0),
-            vec3d(90,r++,0),
+            boss,
+            vec3d(u,y,2),
+            vec3d(90,-90,0),
             vec3d(0.5,0.5,0.5),
             vec4d(1,1,1,1),
-            texture
-        );
+            bosstexture
+        );*/
+        
         if (r > 360)r -= 360;
         glPopMatrix();
         /* drawing code above here! */
@@ -201,4 +433,3 @@ void set_camera(Vec3D position, Vec3D rotation)
                  -position.z);
 }
 
-/*eol@eof*/
