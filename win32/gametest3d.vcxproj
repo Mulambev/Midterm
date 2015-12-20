@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Audio.c" />
     <ClCompile Include="..\src\body.c" />
     <ClCompile Include="..\src\Boss.c" />
     <ClCompile Include="..\src\collisions.c" />

@@ -33,6 +33,7 @@
 #include <stdio.h>
 
 void set_camera(Vec3D position, Vec3D rotation);
+extern Uint32 TIME;
 
 void touch_callback(void *data, void *context)
 {
@@ -87,7 +88,7 @@ Entity *newCube(Vec3D position,const char *name)
     }*/
     ent->objModel = obj_load("models/cube.obj");//ent->objAnimation[0];
 	if( !ent->objModel )
-		slog( "fuck" );
+		slog( "test" );
     ent->texture = LoadSprite("models/cube_text.png",1024,1024); //LoadSprite("models/robot/robot.png",1024,1024);
     vec3d_cpy(ent->body.position,position);
 	vec3d_set(ent->scale,1,1,1);
@@ -102,47 +103,6 @@ Entity *newCube(Vec3D position,const char *name)
     return ent;
 }
 
-/*Entity *Player(Vec3D position, const char *name)
-	{
-		Entity * ent;
-		char buffer[255];
-		int i;
-		ent = entity_new();
-		if (!ent)
-		{
-			return NULL;
-		}
-
-		ent->objModel = obj_load("models/MPU.obj");
-		ent->texture = LoadSprite("models/MegaManBody1.png",1024,1024);
-		vec3d_cpy(ent->body.position,position);
-		cube_set(ent->body.bounds,-2.5,-2.5,0,2.5,2.5,2);
-		ent->think = think;
-		ent->state = 0;
-		mgl_callback_set(&ent->body.touch,touch_callback,ent);
-		return ent;
-
-		
-		
-		
-		/*1,					//inuse
-		1,					// uid
-		megaman,			//name[128]
-		vec3d(f, g, 2),		//position
-		vec3d(90,90,0),		//rotation
-		vec3d(0.5,0.5,0.5),	//scale
-		vec4d(1,1,1,1),		//color
-		megaman,			//model
-		megaman[0],			//animation
-		100,				//health
-		1,					//state
-		0,					//frame
-		megamantexture,		//texture
-		//Body body			//body
-		1;					//group
-		//void (*think)(struct Entity_S *self); //beh? think function maybe
-	}*/
-
 
 int main(int argc, char *argv[])
 {
@@ -154,14 +114,23 @@ int main(int argc, char *argv[])
 	int y = 0;
 	int u = 15;
 	int q = 0;
+	int gamestate=0;
+	int PlayerHP=15, Bosshealth=30, enemy1health=5, enemy2health=5, Bigtimer=600, CD;
+	int SpawnLemon1=0, SpawnLemon2=0, SpawnLemon3=0, SpawnBigLemon=0, enemybullet=0;
+	float Lemonx1=0, Lemonx2=0, Lemonx3=0, LemonxBig=0, enemybulletx=0;
+	int Lemony1=0, Lemony2=0, Lemony3=0, LemonyBig=0, enemybullety=0;
+	int a=0, b=0, c=0, d=0, count, Goomba_attack1=0, Goomba_attack2=0, Goomba_move1, Goomba_move2;
     Space *space;
     Entity *cube1,*cube2, *Actor;
     char bGameLoopRunning = 1;
+	Vec3D Bosspos = {u, y, 2};
+	Vec3D enemy1pos = {5, 10, 2};
+	Vec3D enemy2pos = {5, -10, 2};
     Vec3D cameraPosition = {0,0,70.3};
     Vec3D cameraRotation = {0,0,360};
     SDL_Event e;
-    Obj *megaman,*boss, *mapp, *mape, *lemon;
-    Sprite *megamantexture, *bosstexture, *maptexture1, *maptexture2, *lemontexture;
+    Obj *megaman,*boss, *mapp, *mape, *lemon, *BossHPBar, *PlayerHPBar, *Goomba;
+    Sprite *megamantexture, *bosstexture, *maptexture1, *maptexture2, *lemontexture, *BosstextureHP, *PlayertextureHP, *Goombatexture;
     
     init_logger("gametest3d.log");
     if (graphics3d_init(1024,768,1,"gametest3d",33) != 0)
@@ -173,12 +142,22 @@ int main(int argc, char *argv[])
     entity_init(255);
     
    //load objects, models here, replace cube with megaman
-   // megaman = obj_load("models/MPU.obj");
+    megaman = obj_load("models/MPU.obj");
 	//load his uv map "texture file"
-    //megamantexture = LoadSprite("models/MegaManBody1.png",1024,1024);
+    megamantexture = LoadSprite("models/MegaManBody1.png",1024,1024);
+
+	PlayerHPBar = obj_load("models/cube.obj");
+	PlayertextureHP = NULL;
+
 
 	boss = obj_load("models/Fireman.obj");
 	bosstexture = LoadSprite("models/FireManBody1.png",1024,1024);
+
+	BossHPBar = obj_load("models/cube.obj");
+	BosstextureHP = NULL;
+
+	Goomba = obj_load("models/goomba.obj");
+	Goombatexture = LoadSprite("models/goomba_tex.png",1024,1024);
 
     mapp = obj_load("models/MidtermMapSingle.obj");
 	maptexture1 = LoadSprite("models/PlayerTile(Red).png",1024,1024);
@@ -187,29 +166,13 @@ int main(int argc, char *argv[])
 	maptexture2 = LoadSprite("models/BossTile(Blue).png",1024,1024);
     
     lemon = obj_load("models/cube.obj");
-	lemontexture = LoadSprite("models/cube_text.png",1024,1024);
+	lemontexture = NULL;//LoadSprite("models/cube_text.png",1024,1024);
     
-	//Actor = Player(vec3d(f,g,2), "Megaman");
-	
-    cube1 = newCube(vec3d(u,y,2),"Cubert");
-    //cube2 = newCube(vec3d(10,0,5),"Hobbes");
-    
-    //cube2->body.velocity.x = -0.1;
-    
-    space = space_new();
-    space_set_steps(space,100);
-    
-    //space_add_body(space,&cube1->body);
-    //space_add_body(space,&cube2->body);
-
+	    
     while (bGameLoopRunning)
     {
         entity_think_all();
 
-        for (i = 0; i < 100;i++)
-        {
-            space_do_step(space);
-        }
         while ( SDL_PollEvent(&e) ) 
         {
             if (e.type == SDL_QUIT)
@@ -222,7 +185,7 @@ int main(int argc, char *argv[])
                 {
                     bGameLoopRunning = 0;
                 }
-                else if (e.key.keysym.sym == SDLK_SPACE)
+                else if (e.key.keysym.sym == SDLK_x)
                 {
                     cameraPosition.z++;
                 }
@@ -230,7 +193,7 @@ int main(int argc, char *argv[])
                 {
                     cameraPosition.z--;
                 }
-                else if (e.key.keysym.sym == SDLK_w)
+                else if (e.key.keysym.sym == SDLK_h)
                 {
                     vec3d_add(
                         cameraPosition,
@@ -241,7 +204,7 @@ int main(int argc, char *argv[])
                             0
                         ));
                 }
-                else if (e.key.keysym.sym == SDLK_s)
+                else if (e.key.keysym.sym == SDLK_y)
                 {
                     vec3d_add(
                         cameraPosition,
@@ -252,7 +215,7 @@ int main(int argc, char *argv[])
                             0
                         ));
                 }
-                else if (e.key.keysym.sym == SDLK_d)
+                else if (e.key.keysym.sym == SDLK_j)
                 {
                     vec3d_add(
                         cameraPosition,
@@ -263,7 +226,7 @@ int main(int argc, char *argv[])
                             0
                         ));
                 }
-                else if (e.key.keysym.sym == SDLK_a)
+                else if (e.key.keysym.sym == SDLK_g)
                 {
                     vec3d_add(
                         cameraPosition,
@@ -274,7 +237,7 @@ int main(int argc, char *argv[])
                             0
                         ));
                 }
-				else if (e.key.keysym.sym == SDLK_j)
+				else if (e.key.keysym.sym == SDLK_d)
                 {
                    
 				   
@@ -287,17 +250,21 @@ int main(int argc, char *argv[])
 					   f += 10;
 				   }
                 }
-				else if (e.key.keysym.sym == SDLK_g)
+				else if (e.key.keysym.sym == SDLK_a)
                 {
                    
-				   f -= 10;
+				   
 				   if(f <= -20)
 				   {
 					   f = -25;
 				   }
+				   else
+				   {
+					   f -= 10;
+				   }
 				  			
                 }
-				else if (e.key.keysym.sym == SDLK_y)
+				else if (e.key.keysym.sym == SDLK_w)
                 {
                    
 				   if(g >= 5)
@@ -310,7 +277,7 @@ int main(int argc, char *argv[])
 				   }
 			
                 }
-				else if (e.key.keysym.sym == SDLK_h)
+				else if (e.key.keysym.sym == SDLK_s)
                 {
                    
 				   g -= 10;
@@ -336,27 +303,64 @@ int main(int argc, char *argv[])
                 {
                     cameraRotation.x -= 1;
                 }
-                else if (e.key.keysym.sym == SDLK_n)
+                else if (e.key.keysym.sym == SDLK_SPACE)
                 {
-                    cube1->state ++;
-                    if (cube1->state >= 3)cube1->state = 0;
-
-					/*//Boss_move(u,y);
-					q = q % 2;
-					switch(q)
-					{
-					case 0:
-							maptexture = LoadSprite("models/PlayerTile(Red).png",1024,1024);
-							break;
-					case 1:
-							maptexture = LoadSprite("models/BossTile(Blue).png",1024,1024);
-							break;
-					};
-
-					q+=1;*/
-
+                    
+					CD = TIME + Bigtimer;					
+					
+                }
+				else if (e.key.keysym.sym == SDLK_n)
+                {
+                   
+				   if (enemy1health <= 0 && enemy2health <= 0)
+				   {
+					   gamestate=1;
+				   }
+			
+                }
+				else if (e.key.keysym.sym == SDLK_n)
+                {
+                   
+				   if (enemy1health <= 0 && enemy2health <= 0)
+				   {
+					   gamestate=1;
+				   }
+			
                 }
             }
+			else if (e.type == SDL_KEYUP)
+			{
+				if (e.key.keysym.sym == SDLK_SPACE)
+				{
+					
+					if (TIME >= CD && SpawnBigLemon !=1)
+					{
+						SpawnBigLemon = 1;
+						LemonxBig = f;
+						LemonyBig = g;
+					}
+					else if (SpawnLemon1 != 1)
+					{
+						SpawnLemon1 = 1;
+						Lemonx1 = f;
+						Lemony1 = g;
+					}
+					else if (SpawnLemon2 != 1)
+					{
+						SpawnLemon2 = 1;
+						Lemonx2 = f;
+						Lemony2 = g;
+					}
+					else if (SpawnLemon3 != 1)
+					{
+						SpawnLemon3 = 1;
+						Lemonx3 = f;
+						Lemony3 = g;
+					}
+					
+				}
+			}
+				
         }
 
                 
@@ -367,9 +371,10 @@ int main(int argc, char *argv[])
             cameraPosition,
             cameraRotation);
         
-        entity_draw_all();
+        //entity_draw_all();
       
-   
+		if (PlayerHP > 0 )
+		{
 		//Megaman
         obj_draw(
             megaman,
@@ -380,10 +385,177 @@ int main(int argc, char *argv[])
             megamantexture
         );
 
-		//entity_draw(player);
+		//Megaman HP BAR
+		obj_draw(
+            PlayerHPBar,
+            vec3d(-30+PlayerHP/(2),20,2),
+            vec3d(90,-90,0),
+            vec3d(.9,.9,PlayerHP/(2)),
+            vec4d(0,1,0,1),
+			PlayertextureHP
+        );
+		}
 
+		//Megaman Projectiles
+		//Lemon1
+		if (SpawnLemon1 != 0)
+		{
+			obj_draw(
+			lemon,
+            vec3d(Lemonx1 + a*(.4), Lemony1, 4),
+            vec3d(90,90,0),
+            vec3d(1,1,2),
+            vec4d(.95,.89,0,1),
+		    lemontexture
+		);
+			a++;
+				if (Lemonx1 + a*(.4) >=30)
+				{
+					SpawnLemon1 = 0;
+					a=0;
+				}
+				else if (Lemonx1 + a*(.4) == enemy1pos.x && Lemony1 == enemy1pos.y)
+				{
+					SpawnLemon1 = 0;
+					a=0;
+					enemy1health -= 1;
+					//slog("Enemy Health %d",enemy1health);
+				}
+				else if (Lemonx1 + a*(.4) == enemy2pos.x && Lemony1 == enemy2pos.y)
+				{
+					SpawnLemon1 = 0;
+					a=0;
+					enemy2health -= 1;
+					//slog("Enemy Health %d",enemy2health);
+				}
+				else if (gamestate == 1 && Lemonx1 + a*(.4) == Bosspos.x && Lemony1 == Bosspos.y)
+				{
+				SpawnLemon1 = 0;
+				a=0;
+				Bosshealth -= 1;
+				//slog("Boss Health %d",Bosshealth);
+				}
+		}
+		//Lemon2
+		if (SpawnLemon2 != 0)
+		{
+			obj_draw(
+			lemon,
+            vec3d(Lemonx2 + b*(.4), Lemony2, 4),
+            vec3d(90,90,0),
+            vec3d(1,1,2),
+            vec4d(.95,.89,0,1),
+		    lemontexture
+		);
+			b++;
+				if (Lemonx2 + b*(.4) >=30)
+				{
+					SpawnLemon2 = 0;
+					b=0;
+				}
+				else if (Lemonx2 + b*(.4) == enemy1pos.x && Lemony2 == enemy1pos.y)
+				{
+					SpawnLemon2 = 0;
+					b=0;
+					enemy1health -= 1;
+					//slog("Enemy Health %d",enemy1health);
+				}
+				else if (Lemonx2 + b*(.4) == enemy2pos.x && Lemony2 == enemy2pos.y)
+				{
+					SpawnLemon2 = 0;
+					b=0;
+					enemy2health -= 1;
+					//slog("Enemy Health %d",enemy2health);
+				}
+				else if (gamestate == 1 && Lemonx2 + b*(.4) == Bosspos.x && Lemony2 == Bosspos.y)
+				{
+					SpawnLemon2 = 0;
+					b=0;
+					Bosshealth -= 1;
+					//slog("Boss Health %d",Bosshealth);
+				}
+		}
+		if (SpawnLemon3 != 0)
+		{
+			obj_draw(
+			lemon,
+            vec3d(Lemonx3 + c*(.4), Lemony3, 4),
+            vec3d(90,90,0),
+            vec3d(1,1,2),
+            vec4d(.95,.89,0,1),
+		    lemontexture
+		);
+			c++;
+				//lemons fly off staege
+				if (Lemonx3 + c*(.4) >=30)
+				{
+					SpawnLemon3 = 0;
+					c=0;
+				}
+				//lemons collide with enemies
+				else if (Lemonx3 + c*(.4) == enemy1pos.x && Lemony3 == enemy1pos.y)
+				{
+					SpawnLemon3 = 0;
+					c=0;
+					enemy1health -= 1;
+					slog("Enemy Health %d",enemy1health);
+				}
+				else if (Lemonx3 + c*(.4) == enemy2pos.x && Lemony3 == enemy2pos.y)
+				{
+					SpawnLemon3 = 0;
+					c=0;
+					enemy2health -= 1;
+					slog("Enemy Health %d",enemy2health);
+				}
+				else if (gamestate == 1 && Lemonx3 + c*(.4) == Bosspos.x && Lemony3 == Bosspos.y)
+				{
+					SpawnLemon3 = 0;
+					c=0;
+					Bosshealth -= 1;
+					//slog("Boss Health %d",Bosshealth);
+				}
+		}
+		if (SpawnBigLemon != 0)
+		{
+			obj_draw(
+			lemon,
+            vec3d(LemonxBig + d*(.4), LemonyBig, 4),
+            vec3d(90,90,0),
+            vec3d(2,2,4),
+            vec4d(.9,.3,.1,1),
+		    lemontexture
+		);
+			d++;
+				if (LemonxBig + d*(.4) >=30)
+				{
+					SpawnBigLemon = 0;
+					d=0;
+				}
+				else if (LemonxBig + d*(.4) == enemy1pos.x && LemonyBig == enemy1pos.y)
+				{
+					SpawnBigLemon = 0;
+					d=0;
+					enemy1health -= 5;
+					//slog("Enemy Health %d",enemy1health);
+				}
+				else if (LemonxBig + d*(.4) == enemy2pos.x && LemonyBig == enemy2pos.y)
+				{
+					SpawnBigLemon = 0;
+					d=0;
+					enemy2health -= 5;
+					//slog("Enemy Health %d",enemy2health);
+				}
+				else if (gamestate == 1 && LemonxBig + d*(.4) == Bosspos.x && LemonyBig == Bosspos.y)
+				{
+					SpawnBigLemon = 0;
+					d=0;
+					Bosshealth -= 5;
+					slog("Boss Health %d",Bosshealth);
+				}
+		}
 
 		
+		//MAP
 		obj_draw(
             mapp,
             vec3d(-15,0,2),
@@ -392,7 +564,6 @@ int main(int argc, char *argv[])
             vec4d(1,1,1,1),
 		    maptexture1
 		);
-
 		obj_draw(
             mape,
             vec3d(15,0,2),
@@ -401,27 +572,142 @@ int main(int argc, char *argv[])
             vec4d(1,1,1,1),
 		    maptexture2
 		);
-			
-
-       	    
 		
-		//Fire man
-        obj_draw(
-            boss,
-            vec3d(u,y,2),
+
+		//Enemies
+		if (gamestate == 0)
+		{
+
+			if (enemy1health > 0)
+			{
+			//enemy_move(enemypos.x,enemypos.y, &enemypos);
+			//enemy_attack1(Goomba_attack1, &enemy1pos);
+
+			obj_draw(
+            Goomba,
+            vec3d(enemy1pos.x,enemy1pos.y,2),
             vec3d(90,-90,0),
-            vec3d(0.5,0.5,0.5),
+            vec3d(0.1,0.1,0.1),
             vec4d(1,1,1,1),
-            bosstexture
-        );
+            Goombatexture
+			);
+						
+			if (Goomba_attack1 == 0)
+			{
+				Goomba_attack1 = rand_ranged( 1, 5); //start to (end - 1)
+				if (Goomba_attack1 == 2)
+				{
+					Goomba_attack1 = 1;
+				}
+		
+			};
+
+			if (Goomba_attack1 == 1)
+			{
+				enemy1pos.x -=.1;
+				if (enemy1pos.x <= -30)
+				{
+					Goomba_attack1 = 0;
+					enemy1pos.x = 5;
+				}
+			}
+
+			}
+			else
+			{
+				enemy1pos.x = 50;
+				enemy1pos.y = 50;
+			}
+
+			if (enemy2health > 0)
+			{
+			//enemy_move(enemypos.x,enemypos.y, &enemypos);
+			//enemy_attack2(Goomba_attack2, &enemy2pos);
+			obj_draw(
+            Goomba,
+            vec3d(enemy2pos.x,enemy2pos.y,2),
+            vec3d(90,-90,0),
+            vec3d(0.1,0.1,0.1),
+            vec4d(1,1,1,1),
+            Goombatexture
+			);
+
+			//bottom Goomba won't attack
+
+			if (Goomba_attack2 == 0)
+			{
+				Goomba_attack2 = rand_ranged( 1, 5); //start to (end - 1)
+				if (Goomba_attack2 == 2)
+				{
+					Goomba_attack2 = 1;
+				}
+		
+			};
+
+			if (Goomba_attack2 == 1)
+			{
+				enemy2pos.x -=.1;
+				if (enemy2pos.x <= -30)
+				{
+					Goomba_attack2 = 0;
+					enemy2pos.x = 5;
+				}
+			}
+
+			
+			}
+			else
+			{
+				enemy2pos.x = 50;
+				enemy2pos.y = 50;
+			}
+			
+		}
+		if (gamestate != 0)
+		{
+		if (Bosshealth > 0)
+		{
+			Boss_move(Bosspos.x,Bosspos.y, &Bosspos);      	    
+			//Fire man
+			obj_draw(
+				boss,
+				vec3d(Bosspos.x,Bosspos.y,2),
+				vec3d(90,-90,0),
+				vec3d(0.5,0.5,0.5),
+				vec4d(1,1,1,1),
+				bosstexture
+				);
+
+				obj_draw(
+				BossHPBar,
+				vec3d(30-Bosshealth/(2.5),20,2),
+				vec3d(90,-90,0),
+				vec3d(.9,.9,Bosshealth/(2.5)),
+				vec4d(1,0,0,1),
+				BosstextureHP
+			);
+
+		}
+		else
+		{
+			obj_free(boss);
+
+			Bosspos.x = 50;
+			Bosspos.y = 50;
+			slog("You WIN!");
+		}
+		
+
+		}
         
         if (r > 360)r -= 360;
         glPopMatrix();
         /* drawing code above here! */
         graphics3d_next_frame();
-    } 
-    return 0;
-}
+	} 
+	return 0;
+	}
+
 
 void set_camera(Vec3D position, Vec3D rotation)
 {

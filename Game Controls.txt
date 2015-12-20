@@ -1,0 +1,4 @@
+w, a, s, d for movement
+Spacebar to shoot, Holding space bar will release a charged shot
+
+after the initial enemies are defeated press n to challenge the boss
